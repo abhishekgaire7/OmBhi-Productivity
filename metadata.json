@@ -1,0 +1,6 @@
+{
+  "name": "OmBhi",
+  "description": "A beautiful, motivating personal productivity scheduler with daily planning, habit tracking, calendar time-blocking, and progress analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

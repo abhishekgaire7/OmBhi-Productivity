@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Connection testing doc
+    match /test/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // User document and user data hierarchy
+    match /users/{userId} {
+      // User profile document
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create, update: if isOwner(userId) && isValidId(userId);
+      allow delete: if isOwner(userId);
+
+      // Tasks subcollection (strictly isolated to the authenticated user)
+      match /tasks/{taskId} {
+        allow get: if isOwner(userId) && isValidId(taskId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(taskId) && (!('userId' in request.resource.data) || request.resource.data.userId == userId);
+        allow delete: if isOwner(userId) && isValidId(taskId);
+      }
+
+      // Recurring Schedules subcollection
+      match /schedules/{scheduleId} {
+        allow get: if isOwner(userId) && isValidId(scheduleId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(scheduleId) && (!('userId' in request.resource.data) || request.resource.data.userId == userId);
+        allow delete: if isOwner(userId) && isValidId(scheduleId);
+      }
+
+      // Habits subcollection
+      match /habits/{habitId} {
+        allow get: if isOwner(userId) && isValidId(habitId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(habitId) && (!('userId' in request.resource.data) || request.resource.data.userId == userId);
+        allow delete: if isOwner(userId) && isValidId(habitId);
+      }
+
+      // Custom Categories subcollection
+      match /categories/{categoryId} {
+        allow get: if isOwner(userId) && isValidId(categoryId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(categoryId) && (!('userId' in request.resource.data) || request.resource.data.userId == userId);
+        allow delete: if isOwner(userId) && isValidId(categoryId);
+      }
+
+      // Reminders subcollection
+      match /reminders/{reminderId} {
+        allow get: if isOwner(userId) && isValidId(reminderId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(reminderId) && (!('userId' in request.resource.data) || request.resource.data.userId == userId);
+        allow delete: if isOwner(userId) && isValidId(reminderId);
+      }
+
+      // In-App Notifications subcollection
+      match /notifications/{notificationId} {
+        allow get: if isOwner(userId) && isValidId(notificationId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(notificationId) && (!('userId' in request.resource.data) || request.resource.data.userId == userId);
+        allow delete: if isOwner(userId) && isValidId(notificationId);
+      }
+
+      // Timetable Templates subcollection
+      match /timetableTemplates/{templateId} {
+        allow get: if isOwner(userId) && isValidId(templateId);
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidId(templateId) && (!('userId' in request.resource.data) || request.resource.data.userId == userId);
+        allow delete: if isOwner(userId) && isValidId(templateId);
+      }
+    }
+
+    // Global Fallback: Explicitly Deny Any Unmatched Access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

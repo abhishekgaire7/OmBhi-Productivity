@@ -1,0 +1,103 @@
+{
+  "entities": {
+    "User": {
+      "path": "/users/{userId}",
+      "schema": {
+        "id": "string",
+        "email": "string",
+        "displayName": "string",
+        "photoURL": "string",
+        "updatedAt": "string"
+      }
+    },
+    "Task": {
+      "path": "/users/{userId}/tasks/{taskId}",
+      "schema": {
+        "id": "string",
+        "userId": "string",
+        "title": "string",
+        "description": "string",
+        "scheduledDate": "string",
+        "startTime": "string",
+        "endTime": "string",
+        "categoryId": "string",
+        "priority": "string",
+        "status": "string",
+        "progress": "number",
+        "subtasks": "array",
+        "notes": "string",
+        "recurrence": "string",
+        "seriesId": "string",
+        "isDetached": "boolean",
+        "createdAt": "string",
+        "updatedAt": "string"
+      }
+    },
+    "RecurringSchedule": {
+      "path": "/users/{userId}/schedules/{scheduleId}",
+      "schema": {
+        "id": "string",
+        "userId": "string",
+        "title": "string",
+        "description": "string",
+        "startTime": "string",
+        "endTime": "string",
+        "categoryId": "string",
+        "priority": "string",
+        "subtasks": "array",
+        "notes": "string",
+        "scheduleMode": "string",
+        "frequency": "string",
+        "recurrenceDays": "array",
+        "specificDates": "array",
+        "startDate": "string",
+        "endDate": "string",
+        "isPaused": "boolean",
+        "excludedDates": "array",
+        "createdAt": "string",
+        "updatedAt": "string"
+      }
+    },
+    "Habit": {
+      "path": "/users/{userId}/habits/{habitId}",
+      "schema": {
+        "id": "string",
+        "userId": "string",
+        "name": "string",
+        "categoryId": "string",
+        "targetDaysPerWeek": "number",
+        "frequency": "string",
+        "completedDates": "array",
+        "streak": "number",
+        "icon": "string",
+        "createdAt": "string",
+        "updatedAt": "string"
+      }
+    },
+    "Category": {
+      "path": "/users/{userId}/categories/{categoryId}",
+      "schema": {
+        "id": "string",
+        "userId": "string",
+        "name": "string",
+        "color": "string",
+        "icon": "string",
+        "isDefault": "boolean",
+        "createdAt": "string",
+        "updatedAt": "string"
+      }
+    },
+    "TimetableTemplate": {
+      "path": "/users/{userId}/timetableTemplates/{templateId}",
+      "schema": {
+        "id": "string",
+        "userId": "string",
+        "name": "string",
+        "description": "string",
+        "slots": "array",
+        "createdAt": "string",
+        "updatedAt": "string"
+      }
+    }
+  }
+}
