@@ -7,6 +7,7 @@ import {
 } from 'firebase/firestore';
 import { db, auth, handleFirestoreError, OperationType } from './firebase';
 import { Category, Habit, InAppNotification, RecurringSchedule, Reminder, Task, TimetableTemplate } from '../types';
+import { computeNextRunAtUtcMs } from '../shared/reminderScheduler';
 
 /**
  * Recursively cleans an object for Cloud Firestore:
@@ -374,6 +375,10 @@ export async function syncReminderToCloud(userId: string, reminder: Reminder): P
       lastNotifiedAt: reminder.lastNotifiedAt ?? null,
       emailSentAt: reminder.emailSentAt ?? null,
       timezone: reminder.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+      nextRunAtUtcMs: computeNextRunAtUtcMs(
+        reminder,
+        reminder.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone
+      ),
       createdAt: reminder.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       userId,

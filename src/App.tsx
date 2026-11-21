@@ -179,9 +179,17 @@ function formatCloudSyncError(rawError: unknown, fallback = 'Could not connect t
   if (!raw) return fallback;
   try {
     const parsed = JSON.parse(raw);
-    if (parsed && typeof parsed === 'object' && typeof parsed.message === 'string') {
+    const msg =
+      parsed && typeof parsed === 'object'
+        ? typeof parsed.message === 'string'
+          ? parsed.message
+          : typeof parsed.error === 'string'
+          ? parsed.error
+          : ''
+        : '';
+    if (msg) {
       const op = typeof parsed.operationType === 'string' ? parsed.operationType : '';
-      return op ? `${parsed.message} (${op})` : parsed.message;
+      return op ? `${msg} (${op})` : msg;
     }
   } catch {
     // Not JSON; return plain message
@@ -1657,16 +1665,32 @@ function SchedulerApp() {
                       fetchUserSchedules(currentUserId),
                       fetchUserHabits(currentUserId),
                       fetchUserCategories(currentUserId),
+                      fetchUserReminders(currentUserId),
+                      fetchUserNotifications(currentUserId),
+                      fetchUserTimetableTemplates(currentUserId),
                     ])
-                      .then(([cloudTasks, cloudSchedules, cloudHabits, cloudCategories]) => {
-                        setSchedules(cloudSchedules);
-                        setTasks(cloudTasks);
-                        setHabits(cloudHabits);
-                        setCategories(cloudCategories);
-                        setIsWorkspaceLoaded(true);
-                        setIsWorkspaceLoading(false);
-                        setCurrentView('dashboard');
-                      })
+                      .then(
+                        ([
+                          cloudTasks,
+                          cloudSchedules,
+                          cloudHabits,
+                          cloudCategories,
+                          cloudReminders,
+                          cloudNotifications,
+                          cloudTemplates,
+                        ]) => {
+                          setSchedules(cloudSchedules);
+                          setTasks(cloudTasks);
+                          setHabits(cloudHabits);
+                          setCategories(cloudCategories);
+                          setReminders(cloudReminders);
+                          setNotifications(cloudNotifications);
+                          setTimetableTemplates(cloudTemplates);
+                          setIsWorkspaceLoaded(true);
+                          setIsWorkspaceLoading(false);
+                          setCurrentView('dashboard');
+                        }
+                      )
                       .catch((e: any) => {
                         setCloudSyncError(e?.message || 'Connection failed');
                         setIsWorkspaceLoading(false);

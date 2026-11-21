@@ -16,7 +16,7 @@ import {
   User,
 } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
-import { auth, db, googleProvider, testConnection } from '../utils/firebase';
+import { auth, authReady, db, googleProvider, testConnection } from '../utils/firebase';
 
 export interface AppUser {
   uid: string;
@@ -104,6 +104,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [enrolledMfaFactors, setEnrolledMfaFactors] = useState<EnrolledMfaFactor[]>([]);
 
   useEffect(() => {
+    let isMounted = true;
+    let unsubscribe: (() => void) | undefined;
+
     // Ensure legacy localStorage test sessions are permanently purged
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
@@ -113,53 +116,74 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Ignore storage access errors
     }
 
-    testConnection();
+    (async () => {
+      await authReady;
+      if (!isMounted) return;
 
-    const unsubscribe = onAuthStateChanged(
-      auth,
-      async (firebaseUser) => {
-        if (firebaseUser) {
-          const appUser: AppUser = {
-            uid: firebaseUser.uid,
-            email: firebaseUser.email,
-            displayName: firebaseUser.displayName,
-            photoURL: firebaseUser.photoURL,
-          };
-          setUser(appUser);
-          setEnrolledMfaFactors(mapMfaFactors(firebaseUser));
-          setMfaResolver(null);
+      testConnection();
 
-          // Sync / initialize user profile doc
-          try {
-            const userRef = doc(db, 'users', firebaseUser.uid);
-            await setDoc(
-              userRef,
-              {
-                id: firebaseUser.uid,
-                email: firebaseUser.email || '',
-                displayName: firebaseUser.displayName || '',
-                photoURL: firebaseUser.photoURL || '',
-                updatedAt: new Date().toISOString(),
-              },
-              { merge: true }
-            );
-          } catch (err: any) {
-            console.warn('Failed to sync user profile document:', err?.code || 'SYNC_WARN');
+      unsubscribe = onAuthStateChanged(
+        auth,
+        async (firebaseUser) => {
+          if (!isMounted) return;
+          if (firebaseUser) {
+            const appUser: AppUser = {
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName,
+              photoURL: firebaseUser.photoURL,
+            };
+
+            try {
+              await firebaseUser.getIdToken();
+            } catch {
+              // Proceed and let Firestore handle any token errors
+            }
+
+            // Sync / initialize user profile doc before opening workspace queries
+            try {
+              const userRef = doc(db, 'users', firebaseUser.uid);
+              await setDoc(
+                userRef,
+                {
+                  id: firebaseUser.uid,
+                  email: firebaseUser.email || '',
+                  displayName: firebaseUser.displayName || '',
+                  photoURL: firebaseUser.photoURL || '',
+                  updatedAt: new Date().toISOString(),
+                },
+                { merge: true }
+              );
+            } catch (err: any) {
+              console.warn('Failed to sync user profile document:', err?.code || 'SYNC_WARN');
+            }
+
+            if (!isMounted) return;
+            setUser(appUser);
+            setEnrolledMfaFactors(mapMfaFactors(firebaseUser));
+            setMfaResolver(null);
+          } else {
+            setUser(null);
+            setEnrolledMfaFactors([]);
           }
-        } else {
-          setUser(null);
-          setEnrolledMfaFactors([]);
+          if (isMounted) {
+            setLoading(false);
+          }
+        },
+        (error) => {
+          console.error('Auth state error:', (error as any)?.code || 'AUTH_STATE_ERROR');
+          if (isMounted) {
+            setAuthError(error.message);
+            setLoading(false);
+          }
         }
-        setLoading(false);
-      },
-      (error) => {
-        console.error('Auth state error:', (error as any)?.code || 'AUTH_STATE_ERROR');
-        setAuthError(error.message);
-        setLoading(false);
-      }
-    );
+      );
+    })();
 
-    return () => unsubscribe();
+    return () => {
+      isMounted = false;
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const signInWithGoogle = async () => {

@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "types": ["@cloudflare/workers-types"],
+    "strict": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true
+  },
+  "include": [
+    "src/worker/**/*.ts",
+    "src/shared/**/*.ts",
+    "src/utils/naturalLanguageTask.ts",
+    "src/utils/dayPlanner.ts",
+    "src/utils/consistencyCoach.ts",
+    "src/utils/date.ts",
+    "src/types/index.ts",
+    "functions/**/*.ts"
+  ],
+  "exclude": ["src/**/*.test.ts"]
+}

@@ -11,4 +11,6 @@ firebase-admin-key*.json
 *.pem
 *.key
 server-scheduled-reminders.json
-
+dist-worker/
+.wrangler/
+.dev.vars

@@ -7,6 +7,8 @@
         "email": "string",
         "displayName": "string",
         "photoURL": "string",
+        "timezone": "string",
+        "lastSyncedAt": "string",
         "updatedAt": "string"
       }
     },
@@ -70,6 +72,7 @@
         "completedDates": "array",
         "streak": "number",
         "icon": "string",
+        "notes": "string",
         "createdAt": "string",
         "updatedAt": "string"
       }
@@ -85,6 +88,46 @@
         "isDefault": "boolean",
         "createdAt": "string",
         "updatedAt": "string"
+      }
+    },
+    "Reminder": {
+      "path": "/users/{userId}/reminders/{reminderId}",
+      "schema": {
+        "id": "string",
+        "userId": "string",
+        "title": "string",
+        "description": "string",
+        "date": "string",
+        "time": "string",
+        "categoryId": "string",
+        "priority": "string",
+        "repeat": "string",
+        "customRepeatDays": "array",
+        "notificationMethod": "string",
+        "completed": "boolean",
+        "completedAt": "string",
+        "snoozedUntil": "string",
+        "lastNotifiedAt": "string",
+        "emailSentAt": "string",
+        "timezone": "string",
+        "nextRunAtUtcMs": "number",
+        "createdAt": "string",
+        "updatedAt": "string"
+      }
+    },
+    "InAppNotification": {
+      "path": "/users/{userId}/notifications/{notificationId}",
+      "schema": {
+        "id": "string",
+        "userId": "string",
+        "reminderId": "string",
+        "title": "string",
+        "message": "string",
+        "priority": "string",
+        "read": "boolean",
+        "scheduledFor": "string",
+        "deliveredViaPending": "boolean",
+        "createdAt": "string"
       }
     },
     "TimetableTemplate": {

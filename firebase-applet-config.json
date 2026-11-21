@@ -6,5 +6,7 @@
   "firestoreDatabaseId": "(default)",
   "storageBucket": "ombhi-a81ae.firebasestorage.app",
   "messagingSenderId": "26256150585",
-  "measurementId": "G-1EKP8NB6EW"
+  "measurementId": "G-1EKP8NB6EW",
+  "oAuthClientId": "26256150585-ggvhcgd84k6jdpuqvv64m5vp2f8hrrn8.apps.googleusercontent.com",
+  "recaptchaSiteKey": ""
 }

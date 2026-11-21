@@ -1,0 +1,39 @@
+name = "ombhi-api"
+main = "src/worker/index.ts"
+compatibility_date = "2025-10-01"
+
+# Non-secret configuration variables (override for your production custom domain / Pages URL)
+[vars]
+FIREBASE_PROJECT_ID = "ombhi-a81ae"
+FIRESTORE_DATABASE_ID = "(default)"
+APP_URL = "https://ombhi.pages.dev"
+ALLOWED_ORIGINS = "https://ombhi.pages.dev"
+REQUIRE_MFA = "false"
+
+# Background reminder scheduler (1-minute minimum frequency on Cloudflare Workers Free tier)
+# Runs runCronReminderScheduler() in src/worker/cron.ts
+[triggers]
+crons = ["* * * * *"]
+
+# Required Cloudflare secrets (set via `npx wrangler secret put <NAME>` before deploying):
+# - GEMINI_API_KEY
+# - FIREBASE_SERVICE_ACCOUNT_JSON  (single-line minified JSON string of Firebase Service Account)
+
+# Isolated Preview environment (deploys as `ombhi-api-preview` with Cron disabled)
+# Deploy preview Worker via: `npx wrangler deploy --env preview`
+# Set preview secrets via:
+#   npx wrangler secret put GEMINI_API_KEY --env preview
+#   npx wrangler secret put FIREBASE_SERVICE_ACCOUNT_JSON --env preview
+[env.preview]
+name = "ombhi-api-preview"
+
+[env.preview.vars]
+FIREBASE_PROJECT_ID = "ombhi-a81ae"
+FIRESTORE_DATABASE_ID = "(default)"
+APP_URL = "https://preview.ombhi.pages.dev"
+ALLOWED_ORIGINS = "https://preview.ombhi.pages.dev,https://ombhi.pages.dev"
+REQUIRE_MFA = "false"
+
+[env.preview.triggers]
+crons = []
+
